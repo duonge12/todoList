@@ -1,4 +1,6 @@
 import { DeleteIcon } from "./delete";
 import { PenIcon } from "./pen";
 import { PlusIcon } from "./plus";
-export {PenIcon, DeleteIcon, PlusIcon}
+import { SearchIcon } from "./search";
+
+export {PenIcon, DeleteIcon, PlusIcon, SearchIcon}

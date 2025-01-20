@@ -1,19 +1,24 @@
 import { useDispatch, useSelector } from "react-redux"
-import { addTask, removeTask, updateTask } from "../../slices/toDoSlice";
+import { addTask} from "../../slices/toDoSlice";
 import { v4 as uuidv4 } from 'uuid';
 import './list.css';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Task from "../Task";
 import React from "react";
+import { SearchIcon } from "../../icons";
+import { useDebounce } from "../../hooks/useDebounce";
 
 
 const List=()=>{
     const [newTask, setNewTask]=useState();
     const list = useSelector(state=> state.todo);
     const dispatch = useDispatch();
+    const [searchVal, setSearchVal]=useState('');
+    const debouncedValue=useDebounce(searchVal,300);
+    const [displayList, setDisplayList]=useState([]);
 
     let completedTask=0;
-    const listTask=list.map((item)=> <Task key={item.id} task={item}/>)
+    const listTask=displayList.map((item)=> <Task key={item.id} task={item}/>)
     const process=list.map(item=>{
         if(item.check){
             completedTask+=1;
@@ -26,10 +31,23 @@ const List=()=>{
         dispatch(addTask({id:uuidv4(),title:newTask, check:false}))
         setNewTask('')
     }
+    useEffect(()=>{
+        const currentDisplayList=list.filter(item=> item.title.includes(debouncedValue))
+        setDisplayList(currentDisplayList)
+    },[debouncedValue,list])
     return(
         <div className="h-auto w-[700px] mx-auto bg-[#499cc1] py-[20px] px-[60px]">
             <div className="bg-white p-3">
-                <h1 className="w-fit h-fit mx-auto text-[30px] font-bold" children={"TODO LIST"}/>
+                <h1 className="w-fit h-fit mx-auto text-[30px] font-bold" children="TODO LIST"/>
+
+                <div className="flex my-3 w-full justify-end relative">
+                    <input 
+                        className="w-[40%] py-1 text-center text-sm border border-[#499cc1] rounded-md" 
+                        placeholder="Search..." 
+                        value={searchVal} onChange={(e)=>setSearchVal(e.target.value)}
+                    />
+                    <div className="absolute right-1 top-1 text-[#9ca8b9] flex items-center w-fit h-fit" children={<SearchIcon/>}/>
+                </div>
                 <div className="flex my-3 w-full">
                     <input 
                         className="w-[90%] py-3 text-center text-lg border border-[#499cc1]" 
